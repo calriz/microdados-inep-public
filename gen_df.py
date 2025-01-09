@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import uuid
 
 from joblib import Parallel, delayed
 import math
@@ -140,6 +141,7 @@ def _expand_rows_for_chunk(df_chunk, row_counts_chunk, chunk_index):
 
         df_temp = pd.DataFrame(
             {
+                "CO_PESSOA_FISICA": [uuid.uuid4().hex.upper() for _ in range(k_i)],
                 "NU_NOTA_REDACAO": grades,
                 "TP_SEXO": gender_list,
                 "TP_RACA": race_list,
@@ -184,7 +186,13 @@ def _expand_rows_for_chunk(df_chunk, row_counts_chunk, chunk_index):
         return pd.concat(df_list, ignore_index=True)
     else:
         return pd.DataFrame(
-            columns=["NU_NOTA_REDACAO", "TP_SEXO", "TP_RACA", "NU_IDADE"]
+            columns=[
+                "CO_PESSOA_FISICA",
+                "NU_NOTA_REDACAO",
+                "TP_SEXO",
+                "TP_RACA",
+                "NU_IDADE",
+            ]
             + location_cols
             + ["SOURCE_ROW"]
         )
@@ -279,7 +287,7 @@ print("Done.")
 print("Generating students...")
 start = time.time()
 
-N = 100_000
+N = 5_000_000
 enem_2023_df = generate_per_student_dataset_parallel(
     microdados_censo_2023, N, n_jobs=16
 )
